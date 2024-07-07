@@ -17,6 +17,7 @@ import {
 } from 'src/constants/articleProps';
 import { useState, useRef, useEffect } from 'react';
 import styles from './ArticleParamsForm.module.scss';
+import clsx from 'clsx';
 
 interface ArticleParamsFormProps {
 	setAppState: (state: ArticleStateType) => void;
@@ -42,18 +43,20 @@ export const ArticleParamsForm = ({ setAppState }: ArticleParamsFormProps) => {
 		setformState(defaultArticleState);
 	}
 
-	function handleOutsideFormClick(event: MouseEvent) {
-		if (formRef.current && !formRef.current.contains(event.target as Node)) {
-			setFormOpenState(false);
-		}
-	}
-
 	useEffect(() => {
+		if (!formOpenState) return;
+
+		function handleOutsideFormClick(event: MouseEvent) {
+			if (formRef.current && !formRef.current.contains(event.target as Node)) {
+				setFormOpenState(false);
+			}
+		}
+
 		document.addEventListener('mousedown', handleOutsideFormClick);
 		return () => {
 			document.removeEventListener('mousedown', handleOutsideFormClick);
 		};
-	}, []);
+	}, [formOpenState]);
 
 	return (
 		<>
@@ -62,11 +65,7 @@ export const ArticleParamsForm = ({ setAppState }: ArticleParamsFormProps) => {
 				formIsOpened={formOpenState}
 			/>
 			<aside
-				className={
-					formOpenState
-						? `${styles.container} ${styles.container_open}`
-						: styles.container
-				}
+				className={clsx(styles.container,{[styles.container_open]: formOpenState})}
 				ref={formRef}>
 				<form className={styles.form} onSubmit={handleFormSubmit}>
 					<Text as={'h2'} size={31} weight={800} uppercase={true}>
